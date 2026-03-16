@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#13141A" />
+  <title>WTF-Рулетка: Прощай репутация</title>
+
+  <!-- Google Fonts: Bebas Neue (заголовки) + Outfit + Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Caveat:wght@700&family=Outfit:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet" />
+
+  <!-- Telegram Web Apps SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <!-- Дизайн-токены -->
+  <link rel="stylesheet" href="design/tokens.css" />
+  <!-- Основные стили -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+
+  <!-- Глобальные контроллеры -->
+  <div class="top-controls">
+    <button id="rules-btn" class="control-btn rules-icon-btn" type="button" aria-label="Правила">📜</button>
+    <button id="theme-btn" class="control-btn" type="button" aria-label="Смена темы">🌓</button>
+    <button id="mute-btn" class="control-btn" type="button" aria-label="Звук">🔊</button>
+  </div>
+
+  <!-- ╔══════════════════════════════════════════╗
+       ║  ЭКРАН 1: НАСТРОЙКА ИГРОКОВ              ║
+       ╚══════════════════════════════════════════╝ -->
+  <div id="setup-screen" class="setup-screen">
+
+    <header class="setup-header">
+      <h1 class="app-title">
+        <span class="title-accent">WTF</span><span class="title-main">Рулетка</span>
+        <span class="title-badge">18+</span>
+      </h1>
+      <p class="app-subtitle">Прощай репутация</p>
+    </header>
+
+    <div class="setup-body">
+      <p class="setup-hint">Добавьте игроков (2–8)</p>
+
+      <!-- Поле ввода -->
+      <div class="setup-input-row">
+        <input
+          id="player-name-input"
+          class="setup-input"
+          type="text"
+          placeholder="Имя игрока..."
+          maxlength="20"
+          autocomplete="off"
+        />
+        <button id="add-player-btn" class="setup-add-btn" type="button" aria-label="Добавить">+</button>
+      </div>
+
+      <!-- Список добавленных игроков -->
+      <ul id="players-list" class="players-list" aria-label="Список игроков"></ul>
+
+      <!-- Выбор уровня -->
+      <div class="level-selection">
+        <p class="level-title">Уровень игры:</p>
+        <label class="level-label">
+          <input type="radio" name="game-level" value="normal" class="level-radio" checked>
+          <span class="level-text">Репутация под угрозой (Базовый)</span>
+        </label>
+        <label class="level-label">
+          <input type="radio" name="game-level" value="18plus" class="level-radio">
+          <span class="level-text">Прощай репутация (18+)</span>
+        </label>
+      </div>
+
+      <!-- Кнопка правил (на видном месте) -->
+      <button id="rules-btn-setup" class="setup-rules-btn" type="button">
+        📜 Правила игры
+      </button>
+
+      <!-- Кнопка старта -->
+      <button id="start-game-btn" class="start-btn" type="button" disabled>
+        Начать игру 🎲
+      </button>
+    </div>
+
+  </div><!-- #setup-screen -->
+
+
+  <!-- ╔══════════════════════════════════════════╗
+       ║  ЭКРАН 2: ИГРОВОЕ ПОЛЕ                   ║
+       ╚══════════════════════════════════════════╝ -->
+  <div id="game-screen" class="app" hidden>
+
+    <!-- Шапка -->
+    <header class="app-header">
+      <h1 class="app-title">
+        <span class="title-accent">WTF</span><span class="title-main">Рулетка</span>
+        <span class="title-badge">18+</span>
+      </h1>
+      <p class="app-subtitle">Прощай репутация</p>
+    </header>
+
+    <!-- Ход текущего игрока -->
+    <div class="turn-banner" id="turn-banner" aria-live="polite">
+      <!-- Заполняется players.js -->
+    </div>
+
+    <!-- Секция с колесом -->
+    <main class="wheel-section">
+      <div class="wheel-container">
+        <!-- Стрелка-указатель -->
+        <div class="wheel-pointer" aria-hidden="true">
+          <svg width="32" height="36" viewBox="0 0 32 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="ptrGold" x1="16" y1="0" x2="16" y2="36" gradientUnits="userSpaceOnUse">
+                <stop offset="0%"  stop-color="#F0D070"/>
+                <stop offset="100%" stop-color="#C9A84C"/>
+              </linearGradient>
+              <filter id="ptrShadow">
+                <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="rgba(0,0,0,0.5)" />
+              </filter>
+            </defs>
+            <path d="M16 34 L1 2 L31 2 Z" fill="#DCDDE6" filter="url(#ptrShadow)"/>
+            <path d="M16 34 L1 2 L31 2 Z" fill="none" stroke="url(#ptrGold)" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M16 6 L10 18 L22 18 Z" fill="rgba(255,255,255,0.25)"/>
+          </svg>
+        </div>
+        <!-- Холст колеса -->
+        <canvas id="wheel" aria-label="Колесо фортуны"></canvas>
+      </div>
+
+      <!-- Кнопка вращения -->
+      <button id="spin-btn" class="spin-btn" type="button" aria-label="Крутить колесо">
+        <span class="spin-btn__text">КРУТИТЬ</span>
+        <span class="spin-btn__icon" aria-hidden="true">🎲</span>
+      </button>
+    </main>
+
+    <!-- История (лента последних 3 результатов) -->
+    <div class="game-history" id="game-history"></div>
+
+    <!-- Табло очков -->
+    <section class="scoreboard-section" aria-label="Счёт игроков">
+      <div id="scoreboard" class="scoreboard">
+        <!-- Заполняется players.js -->
+      </div>
+    </section>
+
+  </div><!-- #game-screen -->
+
+
+  <!-- ╔══════════════════════════════════════════╗
+       ║  МОДАЛЬНОЕ ОКНО С КАРТОЧКОЙ ЗАДАНИЯ      ║
+       ╚══════════════════════════════════════════╝ -->
+  <div id="modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="card-title" hidden>
+    <div class="modal__overlay" id="modal-overlay"></div>
+    <div class="modal__inner">
+      <div class="card" id="card">
+
+        <!-- Бейдж с типом -->
+        <div class="card__badge" id="card-badge"></div>
+        <!-- Иконка -->
+        <div class="card__icon" id="card-icon" aria-hidden="true"></div>
+        <!-- Заголовок -->
+        <h2 class="card__title" id="card-title"></h2>
+        <!-- Текст задания -->
+        <p class="card__text" id="card-text"></p>
+
+        <!-- Очки за выполнение -->
+        <div class="card__reward" id="card-reward">
+          <span class="reward-label">Награда:</span>
+          <span class="reward-pts" id="reward-pts"></span>
+        </div>
+
+        <!-- Кнопки действий -->
+        <div class="card__actions">
+          <button class="card__btn card__btn--accept" id="card-accept-btn" type="button">
+            ✅ Выполнил!
+          </button>
+          <button class="card__btn card__btn--refuse" id="card-refuse-btn" type="button">
+            ❌ Отказываюсь
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div><!-- #modal -->
+
+
+  <!-- ╔══════════════════════════════════════════╗
+       ║  ПОПАП: НАКАЗАНИЕ ПРИ ОТКАЗЕ             ║
+       ╚══════════════════════════════════════════╝ -->
+  <div id="penalty-modal" class="penalty-modal" role="alertdialog" aria-modal="true" hidden>
+    <div class="penalty-modal__box">
+      <div class="penalty-icon">😈</div>
+      <h3 class="penalty-title">Отказался от задания!</h3>
+      <p class="penalty-text">
+        Остальные игроки придумывают наказание.<br>
+        Очки не начисляются.
+      </p>
+      <button class="penalty-btn" id="penalty-ok-btn" type="button">Понял, отмечаем!</button>
+    </div>
+  </div><!-- #penalty-modal -->
+
+
+  <!-- ╔══════════════════════════════════════════╗
+       ║  ПОПАП: ИТОГИ РАУНДА                     ║
+       ╚══════════════════════════════════════════╝ -->
+  <div id="round-modal" class="round-modal" role="alertdialog" aria-modal="true" hidden>
+    <div class="round-modal__box">
+      <div class="round-icon">📊</div>
+      <h3 class="round-title" id="round-title">Итоги раунда</h3>
+      <p class="round-elim" id="round-elim-name"></p>
+      <button class="round-btn" id="round-continue-btn" type="button">Следующий раунд →</button>
+    </div>
+  </div><!-- #round-modal -->
+
+
+  <!-- ╔══════════════════════════════════════════╗
+       ║  ПОПАП: ТАЙБРЕЙК                         ║
+       ╚══════════════════════════════════════════╝ -->
+  <div id="tiebreak-modal" class="tiebreak-modal" role="alertdialog" aria-modal="true" hidden>
+    <div class="tiebreak-modal__box">
+      <div class="tiebreak-icon">⚔️</div>
+      <h3 class="tiebreak-title">Ничья!</h3>
+      <p class="tiebreak-subtitle">Задание на вылет</p>
+      <div class="tiebreak-names" id="tiebreak-names"></div>
+      <button class="tiebreak-btn" id="tiebreak-go-btn" type="button">Начать тайбрейк 🔥</button>
+    </div>
+  </div><!-- #tiebreak-modal -->
+
+
+  <!-- ╔══════════════════════════════════════════╗
+       ║  ПОПАП: ПОБЕДИТЕЛЬ + КОНФЕТТИ            ║
+       ╚══════════════════════════════════════════╝ -->
+  <div id="winner-modal" class="winner-modal" role="alertdialog" aria-modal="true" hidden>
+    <div class="winner-modal__box">
+      <div class="winner-crown">👑</div>
+      <h2 class="winner-title">ПОБЕДИТЕЛЬ!</h2>
+      <p class="winner-name" id="winner-name"></p>
+      <p class="winner-score" id="winner-score"></p>
+      <button class="winner-btn" id="winner-restart-btn" type="button">Новая игра 🎲</button>
+    </div>
+  </div><!-- #winner-modal -->
+
+
+  <!-- ╔══════════════════════════════════════════╗
+       ║  ПОПАП: ПРАВИЛА ИГРЫ                     ║
+       ╚══════════════════════════════════════════╝ -->
+  <div id="rules-modal" class="rules-modal" role="dialog" aria-modal="true" hidden>
+    <div class="rules-modal__box">
+      <div class="rules-header">
+        <div class="rules-logo">📜</div>
+        <div class="rules-header-text">
+          <h3>ПРАВИЛА ИГРЫ</h3>
+          <p>Manual & Versions</p>
+        </div>
+      </div>
+
+      <div class="rules-content">
+        <section class="rules-section">
+          <h4><span class="dot"></span> ОСНОВЫ</h4>
+          <ul class="rules-list">
+            <li class="rules-item">Каждый игрок делает <b>3 хода</b> за раунд.</li>
+            <li class="rules-item"><b>Белый</b> — 25 очков, <b>Черный</b> — 50, <b>Красный</b> — 100.</li>
+            <li class="rules-item">При отказе наказание придумывают <b>другие игроки</b>.</li>
+            <li class="rules-item">В конце раунда игрок с худшим счетом <b>вылетает</b>.</li>
+          </ul>
+        </section>
+
+        <section class="rules-section">
+          <h4><span class="dot"></span> ВЕРСИИ ИГРЫ</h4>
+          <div class="rules-comparison">
+            <div class="ver-card">
+              <span class="ver-name">БАЗОВАЯ</span>
+              <span class="ver-desc">Легкий флирт, дискомфорт и веселье.</span>
+            </div>
+            <div class="ver-card pro">
+              <span class="ver-name">18+ ТРЕШ</span>
+              <span class="ver-desc">Максимальный риск и безумные задания.</span>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="rules-footer">
+        <button class="rules-btn-close" id="rules-close-btn" type="button">ЗАПОМНИЛ 👌🏼</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Скрипты (порядок важен!) -->
+  <script src="js/audio.js"></script>
+  <script src="js/wheel.js"></script>
+  <script src="js/modal.js"></script>
+  <script src="js/players.js"></script>
+  <script src="data/tasks.js"></script>
+  <script src="data/tasks_18plus.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+
+</html>

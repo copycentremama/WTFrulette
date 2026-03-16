@@ -1,0 +1,127 @@
+/* ============================================================
+   WTF-РУЛЕТКА — Design Tokens v2.0
+   Спринт 5: Modern Board Game — Clean Plastic & Metal
+   ============================================================ */
+
+:root {
+  /* === Background & Surfaces === */
+  --color-bg:          #13141A;   /* Глубокий графитовый фон */
+  --color-surface:     #1C1E28;   /* Поверхность-карточка */
+  --color-surface-2:   #22243000; /* Чуть светлее */
+  --color-border:      rgba(255,255,255,0.08);
+
+  /* === Plastic Wheel Segment Colors === */
+  --color-white-segment: #DDDEE6;   /* Светлый пластик */
+  --color-black-segment: #1A1B24;   /* Тёмный пластик */
+  --color-red-segment:   #C62828;   /* Красный пластик */
+
+  /* === Accent & Gold === */
+  --color-gold:         #C9A84C;   /* Металлическое золото */
+  --color-gold-light:   #E8C96A;
+  --color-silver:       #A0A8B8;   /* Серебро */
+  --color-silver-light: #C8D0DC;
+
+  /* === Text === */
+  --color-text:           #F0F1F5;   /* Основной белый */
+  --color-text-secondary: #7A7F96;   /* Приглушённый серый */
+  --color-text-muted:     #4A4F66;
+
+  /* === Cards (Plastic Imitation) === */
+  /* White card — матово-белый пластик */
+  --card-white-bg:        #FAFAFA;
+  --card-white-text:      #111118;
+  --card-white-border:    #E2E2E8;
+  --card-white-btn-bg:    #2B3AFF;   /* Синяя кнопка на белой карточке */
+  --card-white-btn-text:  #ffffff;
+
+  /* Black card — тёмный оникс */
+  --card-black-bg:        #18191F;
+  --card-black-text:      #E8E9F0;
+  --card-black-border:    rgba(160, 168, 184, 0.2);
+  --card-black-accent:    #A0A8B8;   /* Серебро */
+  --card-black-btn-bg:    #E8E9F0;
+  --card-black-btn-text:  #111118;
+
+  /* Red card — насыщенный красный */
+  --card-red-bg:          #C62828;
+  --card-red-text:        #FFFFFF;
+  --card-red-border:      rgba(255,255,255,0.18);
+  --card-red-btn-bg:      #ffffff;
+  --card-red-btn-text:    #C62828;
+
+  /* === Typography === */
+  --font-display: 'Bebas Neue', 'Outfit', sans-serif;  /* Заголовки (WTF) */
+  --font-accent:  'Caveat', cursive;                    /* Стилизованная 'Рулетка' */
+  --font-heading: 'Outfit', sans-serif;                 /* Карточки */
+  --font-body:    'Inter', sans-serif;
+
+  /* Fluid type scale */
+  --text-xs:   clamp(0.688rem, 1.5vw, 0.75rem);
+  --text-sm:   clamp(0.813rem, 2vw,   0.875rem);
+  --text-base: clamp(0.938rem, 2.5vw, 1rem);
+  --text-lg:   clamp(1rem,     2.8vw, 1.125rem);
+  --text-xl:   clamp(1.125rem, 3.2vw, 1.25rem);
+  --text-2xl:  clamp(1.375rem, 4.2vw, 1.75rem);
+  --text-3xl:  clamp(2rem,     7vw,   3.2rem);   /* Для WTF-Рулетка */
+
+  /* === Spacing (fluid) === */
+  --space-xs:  clamp(3px,  1vw,  4px);
+  --space-sm:  clamp(6px,  2vw,  8px);
+  --space-md:  clamp(12px, 3.5vw, 16px);
+  --space-lg:  clamp(18px, 5vw,  24px);
+  --space-xl:  clamp(22px, 6vw,  32px);
+  --space-2xl: clamp(32px, 8vw,  48px);
+
+  /* === Border Radius === */
+  --radius-sm:   6px;
+  --radius-md:   12px;
+  --radius-lg:   18px;
+  --radius-card: 16px;   /* Настоящие пластиковые карточки */
+  --radius-full: 9999px;
+
+  /* === Shadows (физическая имитация) === */
+  --shadow-sm:   0 1px 4px rgba(0,0,0,0.25);
+  --shadow-md:   0 4px 16px rgba(0,0,0,0.4);
+  --shadow-lg:   0 8px 32px rgba(0,0,0,0.55);
+  /* Тень настоящей карточки */
+  --shadow-card: 0 4px 12px rgba(0,0,0,0.35), 0 16px 40px rgba(0,0,0,0.45);
+  /* Золотое кольцо колеса */
+  --shadow-wheel: 0 0 0 3px rgba(201,168,76,0.3), 0 8px 40px rgba(0,0,0,0.6);
+
+  /* === Transitions === */
+  --transition-fast:   0.12s ease;
+  --transition-base:   0.2s ease;
+  --transition-bounce: 0.38s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+  /* === Layout === */
+  --wheel-size:     min(82vw, 320px);
+  --button-height:  clamp(48px, 12vw, 56px);
+  --modal-max-width: min(92vw, 360px);
+  --card-padding-v: clamp(20px, 5vw, 28px);
+  --card-padding-h: clamp(16px, 4vw, 24px);
+}
+
+/* === СВЕТЛАЯ ТЕМА (TELEGRAM LIGHT) === */
+.theme-light {
+  --color-bg:          #F0F2F5;   /* Светло-серый фон как в TG */
+  --color-surface:     #FFFFFF;
+  --color-surface-2:   rgba(0,0,0,0.03);
+  --color-border:      rgba(0,0,0,0.08);
+  
+  --color-text:           #1C1D21;
+  --color-text-secondary: #5D5E6B;
+  --color-text-muted:     #8A8B99;
+
+  /* Сектора колеса в светлой теме */
+  --color-white-segment: #FFFFFF;
+  --color-black-segment: #2B2C3A;
+
+  /* Карточки (корректировка контраста для светлой темы) */
+  --card-white-text:      #1C1D21;
+  --card-black-text:      #FFFFFF;
+  --card-black-btn-bg:    #FFFFFF;
+  --card-black-btn-text:  #1C1D21;
+}
+
+@media (min-width: 375px) { :root { --wheel-size: min(80vw, 340px); } }
+@media (min-width: 430px) { :root { --wheel-size: min(76vw, 360px); --modal-max-width: 380px; } }
