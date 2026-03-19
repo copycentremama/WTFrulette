@@ -35,6 +35,10 @@ window.PlayersController = (function () {
   let tiebreakPlayers  = [];   // Игроки в тайбрейке
   let tiebreakIndex    = 0;
 
+  // Режим Прилюдия (Спринт 12)
+  let noElimination    = false;
+  let noScoring        = false;
+
   // DOM
   let turnEl       = null;
   let scoreboardEl = null;
@@ -42,7 +46,10 @@ window.PlayersController = (function () {
   // =============================================
   //  ИНИЦИАЛИЗАЦИЯ
   // =============================================
-  function init(names) {
+  function init(names, settings = {}) {
+    noElimination = !!settings.noElimination;
+    noScoring     = !!settings.noScoring;
+
     allPlayers = names.map((name, i) => ({
       name:       name.trim() || 'Игрок ' + (i + 1),
       roundScore: 0,
@@ -53,7 +60,13 @@ window.PlayersController = (function () {
     currentIndex  = 0;
     round         = 1;
     spinInRound   = 0;
-    totalSpinsInRound = activePlayers.length * SPINS_PER_PLAYER;
+
+    if (noElimination && settings.tasksTotal) {
+      totalSpinsInRound = settings.tasksTotal;
+    } else {
+      totalSpinsInRound = activePlayers.length * SPINS_PER_PLAYER;
+    }
+
     tiebreakMode  = false;
     _render();
   }
@@ -76,6 +89,7 @@ window.PlayersController = (function () {
   //  НАЧИСЛИТЬ ОЧКИ
   // =============================================
   function addPoints(sector) {
+    if (noScoring) return 0;
     const pts    = POINTS[sector] || 0;
     const player = getCurrentPlayer();
     if (player) {
@@ -123,6 +137,10 @@ window.PlayersController = (function () {
   //  КОНЕЦ РАУНДА
   // =============================================
   function _endRound() {
+    if (noElimination) {
+      _render();
+      return { type: 'winner', player: { isPrelude: true }, players: activePlayers };
+    }
     // Собираем результаты раунда
     // Спринт 9: используем roundScore (очки за раунд), а не score (очки за игру)
     const scores = activePlayers.map(p => ({
@@ -283,11 +301,12 @@ window.PlayersController = (function () {
     if (scoreboardEl) {
       scoreboardEl.innerHTML = activePlayers.map((p, i) => {
         const isActive = (tiebreakMode ? p === tiebreakPlayers[tiebreakIndex] : i === currentIndex);
+        const scoreHtml = noScoring ? '' : `<span class="score-round-pts">${p.roundScore} <small>очк.</small></span>`;
         return `
           <div class="score-row ${isActive ? 'score-row--active' : ''}">
             <span class="score-avatar" style="background:${p.color}">${_initials(p.name)}</span>
             <span class="score-name">${_escape(p.name)}</span>
-            <span class="score-round-pts">${p.roundScore} <small>очк.</small></span>
+            ${scoreHtml}
           </div>`;
       }).join('');
     }

@@ -1900,3 +1900,41 @@ body {
   color: var(--color-text-muted);
   line-height: 1.6;
 }
+
+/* === Опция Прилюдия (21+) === */
+.prelude-option {
+  background: rgba(201, 168, 76, 0.1);
+  border: 1px dashed rgba(201, 168, 76, 0.4);
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  margin-top: var(--space-xs);
+  animation: slide-in 0.3s ease forwards;
+}
+
+.prelude-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  cursor: pointer;
+  margin-bottom: 4px;
+}
+
+.prelude-checkbox {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--color-gold);
+}
+
+.prelude-text {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--color-gold);
+  font-size: 1rem;
+}
+
+.prelude-hint {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-left: 28px;
+  line-height: 1.3;
+}

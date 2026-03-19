@@ -81,7 +81,7 @@
 
   // Обработчик: "Да, мне есть 21"
   ageYesBtn?.addEventListener('click', () => {
-    localStorage.setItem(AGE_KEY, 'true');
+    sessionStorage.setItem(AGE_KEY, 'true');
     if (ageGateModal) ageGateModal.hidden = true;
 
     // Если была попытка старта игры — продолжаем
@@ -111,7 +111,7 @@
     }
 
     if (code === LUX_CODE) {
-      localStorage.setItem(CODE_KEY, code);
+      sessionStorage.setItem(CODE_KEY, code);
       if (codeGateModal) codeGateModal.hidden = true;
 
       // Если была попытка старта игры — запускаем
@@ -145,12 +145,43 @@
   });
 
   // Функция запуска игры с выбранной версией
+  function _filterPreludeTasks(tasks) {
+    if (!tasks) return { white: [], black: [], red: [], tiebreak: [] };
+    
+    // Чёрный список "гаджетных" и "дистанционных" слов
+    const blacklist = [
+      'напиши', 'отправь', 'позвони', 'tinder', 'сообщение', 'голосовое', 
+      'статус', 'сторис', 'пост', 'комментарий', 'фото', 'видео', 'кружок',
+      'анонимный чат', 'чат', 'мессенджер', 'телефон', 'экран', 'галерея', 
+      'браузер', 'запросы', 'селфи', 'номер'
+    ];
+
+    const filter = (list) => (list || []).filter(item => {
+      const text = item.text.toLowerCase();
+      return !blacklist.some(word => text.includes(word));
+    });
+
+    return {
+      white: [], // В Прилюдии нет белых секторов
+      black: filter(tasks.black),
+      red:   filter(tasks.red),
+      tiebreak: []
+    };
+  }
+
   function startGameWithVersion(version) {
+    const preludeCheckbox = document.getElementById('prelude-checkbox');
+    const isPrelude = version === 'lux' && preludeCheckbox && preludeCheckbox.checked;
+
     if (version === 'lux') {
       document.documentElement.classList.add('theme-lux');
       if (window.TASKS_21PLUS) {
-        window.TASKS = window.TASKS_21PLUS;
-        window.TASKS.tiebreak = window.TASKS_NORMAL?.tiebreak || [];
+        if (isPrelude) {
+          window.TASKS = _filterPreludeTasks(window.TASKS_21PLUS);
+        } else {
+          window.TASKS = window.TASKS_21PLUS;
+          window.TASKS.tiebreak = window.TASKS_NORMAL?.tiebreak || [];
+        }
       } else {
         window.TASKS = window.TASKS_NORMAL;
       }
@@ -168,7 +199,17 @@
     }
 
     const PC = window.PlayersController;
-    PC.init(pendingPlayerNames);
+    if (isPrelude) {
+      const totalTasks = (window.TASKS.black.length + window.TASKS.red.length);
+      PC.init(pendingPlayerNames, { 
+        noElimination: true, 
+        noScoring: true, 
+        tasksTotal: totalTasks 
+      });
+    } else {
+      PC.init(pendingPlayerNames);
+    }
+    
     PC.bindDOM(
       document.getElementById('turn-banner'),
       document.getElementById('scoreboard'),
@@ -176,6 +217,7 @@
 
     // Сброс использованных карточек перед новой игрой
     window.ModalController?.resetUsedTasks();
+    _unlockSpin();
 
     const setupScreen = document.getElementById('setup-screen');
     const gameScreen = document.getElementById('game-screen');
@@ -184,10 +226,13 @@
     document.body.classList.remove('setup-active');
     document.body.classList.add('game-active');
 
-    // Инициализация колеса с правильными пропорциями для раунда 1
+    // Инициализация колеса
     if (window.WheelController) {
       WheelController.init('wheel');
-      if (typeof _updateWheelForRound === 'function') {
+      if (isPrelude) {
+        // 0 белых, 7 чёрных, 3 красных (Спринт 12: Прилюдия)
+        WheelController.rebuildSegments(0, 7, 3);
+      } else if (typeof _updateWheelForRound === 'function') {
         _updateWheelForRound();
       }
     }
@@ -270,6 +315,19 @@
     if (btn) removePlayer(+btn.dataset.index);
   });
 
+  // --- Переключение опций для 21+ ---
+  const preludeContainer = document.getElementById('prelude-container');
+  const levelSelection  = document.querySelector('.level-selection');
+  
+  levelSelection.addEventListener('change', (e) => {
+    if (e.target.name === 'game-level') {
+      const is21 = e.target.value === '21plus';
+      if (preludeContainer) {
+        preludeContainer.style.display = is21 ? 'block' : 'none';
+      }
+    }
+  });
+
   // --- Старт игры ---
   startGameBtn.addEventListener('click', () => {
     if (playerNames.length < 2) return;
@@ -283,8 +341,8 @@
 
     if (level === '21plus') {
       // Проверяем возраст и код
-      const ageVerified = localStorage.getItem(AGE_KEY) === 'true';
-      const codeEntered = localStorage.getItem(CODE_KEY) === LUX_CODE;
+      const ageVerified = sessionStorage.getItem(AGE_KEY) === 'true';
+      const codeEntered = sessionStorage.getItem(CODE_KEY) === LUX_CODE;
 
       if (!ageVerified) {
         // Сначала подтверждаем возраст
@@ -315,12 +373,30 @@
 
   const spinBtn = document.getElementById('spin-btn');
 
+  let spinFailSafeTimeout = null;
+
   spinBtn.addEventListener('click', () => {
     if (isSpinning) return;
+    
+    // Снимаем старый таймаут если есть
+    if (spinFailSafeTimeout) clearTimeout(spinFailSafeTimeout);
+
     spinBtn.disabled = true;
     isSpinning = true;
     try { tg?.HapticFeedback?.impactOccurred('medium'); } catch (_) {}
-    if (window.WheelController) WheelController.spin();
+    
+    if (window.WheelController) {
+      WheelController.spin();
+
+      // УЛЬТИМАТИВНЫЙ ФЕЙЛ-СЕЙФ: 
+      // Если колесо не остановилось за 12 секунд (ошибка JS/RAF), снимаем блок.
+      spinFailSafeTimeout = setTimeout(() => {
+        if (isSpinning) {
+          console.warn('[App] Сработал fail-safe таймаут разблокировки');
+          _unlockSpin();
+        }
+      }, 12000);
+    }
   });
 
   // --- Колесо остановилось ---
@@ -358,6 +434,13 @@
     _afterTurn();
   });
 
+  // --- ГАРАНТИЯ РАЗБЛОКИРОВКИ (Fail-safe) ---
+  document.addEventListener('modalClosed', () => {
+    // Если по какой-то причине (ESC, ошибка) выполнение/отказ не сработали, 
+    // модалка закрыта — кнопка ДОЛЖНА быть активна.
+    _unlockSpin();
+  });
+
   // ╔══════════════════════════════════════════╗
   // ║  ПОСЛЕ ХОДА — ПРОВЕРКА РАУНДА            ║
   // ╚══════════════════════════════════════════╝
@@ -383,6 +466,7 @@
 
       case 'winner':
         _showWinner(result.player);
+        _unlockSpin();
         break;
     }
   }
@@ -445,18 +529,25 @@
   const winnerRestart = document.getElementById('winner-restart-btn');
 
   function _showWinner(player) {
-    if (!winnerModal || !player) return;
+    if (!winnerModal) return;
 
-    winnerName.innerHTML = `<span style="color:${player.color}">${_escape(player.name)}</span>`;
-    winnerScore.textContent = `${player.roundScore} очков в финале`;
+    if (player && !player.isPrelude && typeof player.name !== 'undefined') {
+      winnerName.innerHTML = `<span style="color:${player.color}">${_escape(player.name)}</span>`;
+      winnerScore.textContent = `${player.roundScore} очков в финале`;
+    } else {
+      // Режим Прилюдия — все победители
+      winnerName.innerHTML = `<span style="color:var(--color-gold)">Вы прекрасны!</span>`;
+      winnerScore.textContent = `Все личные задания Прилюдии завершены.`;
+    }
+
     winnerModal.hidden = false;
-
     _launchConfetti();
   }
 
   winnerRestart?.addEventListener('click', () => {
     winnerModal.hidden = true;
     _stopConfetti();
+    _unlockSpin();
     // Возврат к setup
     gameScreen.hidden = true;
     setupScreen.hidden = false;
@@ -521,8 +612,12 @@
   }
 
   function _unlockSpin() {
+    if (spinFailSafeTimeout) {
+      clearTimeout(spinFailSafeTimeout);
+      spinFailSafeTimeout = null;
+    }
     isSpinning = false;
-    spinBtn.disabled = false;
+    if (spinBtn) spinBtn.disabled = false;
   }
 
   function _flashScore(text) {

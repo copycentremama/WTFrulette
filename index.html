@@ -6,12 +6,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="theme-color" content="#13141A" />
 
-  <!-- SEO Meta Tags (SEO Specialist CR-003) -->
+  <!-- SEO Meta Tags -->
   <title>WTF-Рулетка 🎲🔥🔐 Частная коллекция 21+</title>
   <meta name="description" content="200+ безумных заданий для вечеринок. Крути колесо, выполняй задания, теряй репутацию! Эксклюзивная версия 21+ (private luxury edition).">
   <meta name="keywords" content="игра для вечеринок, колесо фортуны, 18+, задания для вечеринок, WTF рулетка, игры для компаний, 21+, private, luxury">
   <meta name="robots" content="index, follow">
-  <meta name="author" content="DreamTeam">
 
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
@@ -94,9 +93,18 @@
           <span class="level-text">🔥 Прощай репутация (18+)</span>
         </label>
         <label class="level-label">
-          <input type="radio" name="game-level" value="21plus" class="level-radio">
+          <input type="radio" name="game-level" value="21plus" class="level-radio" id="level-21plus">
           <span class="level-text">🔐 Частная коллекция (21+)</span>
         </label>
+      </div>
+
+      <!-- Опция Прилюдия (только для 21+) -->
+      <div id="prelude-container" class="prelude-option" style="display: none;">
+        <label class="prelude-label">
+          <input type="checkbox" id="prelude-checkbox" class="prelude-checkbox">
+          <span class="prelude-text">🪄 Режим «Прелюдия» (только личный контакт)</span>
+        </label>
+        <p class="prelude-hint">Без белых секторов, без гаджетов, без выбывания. Только вы.</p>
       </div>
 
       <!-- Кнопка правил (на видном месте) -->
@@ -331,7 +339,7 @@
             <li class="rules-item">Требуется <b>подтверждение возраста</b> (21+).</li>
             <li class="rules-item">LUX-версия доступна <b>только по коду</b>.</li>
             <li class="rules-item">Код выдаётся лично <b>организатором вечеринки</b>.</li>
-            <li class="rules-item">Подтверждение сохраняется — <b>не нужно вводить каждый раз</b>.</li>
+            <li class="rules-item">Подтверждение сохраняется <b>на время сессии</b>.</li>
           </ul>
         </section>
       </div>
