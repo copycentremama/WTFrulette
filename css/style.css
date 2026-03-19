@@ -10,10 +10,16 @@
   padding: 0;
 }
 
-html { height: 100%; overflow-x: hidden; }
+html {
+  height: 100%;
+  overflow-x: hidden;
+  width: 100%;
+}
 
 body {
   height: 100%;
+  min-height: 100vh;
+  width: 100%;
   overflow-x: hidden;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
@@ -33,6 +39,11 @@ body {
       rgba(255,255,255,0.012) 4px,
       rgba(255,255,255,0.012) 5px
     );
+
+  /* Фон на всю ширину экрана */
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
 }
 
 /* === Контейнер приложения === */
@@ -794,19 +805,10 @@ body {
   background: rgba(201,168,76,0.15);
 }
 
-/* Видимость иконки правил: только во время игры */
-.setup-screen ~ .top-controls .rules-icon-btn {
-  display: none;
+/* Видимость кнопки правил: управляется через JS */
+#rules-btn {
+  display: flex;
 }
-
-#game-screen:not([hidden]) ~ .top-controls .rules-icon-btn {
-  display: flex !important;
-}
-
-/* Но на самом деле проще управлять через JS или фиксированный порядок. 
-   Так как .top-controls в начале body, селекторы ~ не сработают.
-   Сделаем через .setup-screen-active класс на body или просто через ID.
-*/
 
 .setup-active .rules-icon-btn { display: none !important; }
 .game-active .rules-icon-btn { display: flex !important; }
@@ -1671,7 +1673,7 @@ body {
 }
 
 /* ============================================================
-   ВЕРХНИЕ КОНТРОЛЛЕРЫ (ТЕМА / ЗВУК)
+   ВЕРХНИЕ КОНТРОЛЛЕРЫ (ТОЛЬКО ПРАВИЛА)
    ============================================================ */
 .top-controls {
   position: absolute;
@@ -1704,10 +1706,197 @@ body {
   background: var(--color-surface-2);
 }
 
-.control-btn.muted, .control-btn.active {
-  background: rgba(43, 58, 255, 0.15);
-  border-color: rgba(43, 58, 255, 0.4);
+.rules-icon-btn {
+  /* Стили для кнопки правил */
 }
 
-/* Удаляем старое */
-.mute-btn, .mute-btn:active, .mute-btn.muted { display: none !important; }
+/* ============================================================
+   AGE VERIFICATION (21+)
+   ============================================================ */
+.age-gate-modal,
+.code-gate-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.age-gate-modal__box,
+.code-gate-modal__box {
+  background: var(--color-surface);
+  border: 2px solid var(--color-accent);
+  border-radius: var(--radius-lg);
+  padding: 40px 32px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 0 50px rgba(124, 77, 255, 0.3);
+}
+
+.age-gate-icon,
+.code-gate-icon {
+  font-size: 4rem;
+  margin-bottom: 16px;
+}
+
+.age-gate-title,
+.code-gate-title {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  color: var(--color-text);
+  margin-bottom: 12px;
+  letter-spacing: 0.05em;
+}
+
+.age-gate-text {
+  font-size: var(--text-base);
+  color: var(--color-text-muted);
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.age-gate-subtext {
+  font-size: var(--text-lg);
+  color: var(--color-text);
+  margin-bottom: 24px;
+  font-weight: 600;
+}
+
+.code-gate-text {
+  font-size: var(--text-base);
+  color: var(--color-text-muted);
+  margin-bottom: 16px;
+}
+
+#lux-code-input {
+  width: 100%;
+  padding: 14px 20px;
+  font-size: var(--text-xl);
+  font-family: var(--font-display);
+  text-align: center;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: var(--color-bg);
+  border: 2px solid var(--color-border);
+  border-radius: 12px;
+  color: var(--color-text);
+  margin-bottom: 12px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+#lux-code-input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 20px rgba(124, 77, 255, 0.3);
+}
+
+#lux-code-input::placeholder {
+  letter-spacing: 0.05em;
+  opacity: 0.5;
+}
+
+.code-error {
+  color: var(--color-red-sector);
+  font-size: var(--text-sm);
+  margin-bottom: 12px;
+  animation: shake 0.4s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-8px); }
+  75% { transform: translateX(8px); }
+}
+
+.age-gate-buttons,
+.code-gate-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.age-gate-buttons button,
+.code-gate-buttons button {
+  padding: 14px 24px;
+  font-size: var(--text-base);
+  font-weight: 600;
+  font-family: var(--font-display);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+  border: none;
+}
+
+#age-yes-btn,
+#code-submit-btn {
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-secondary));
+  color: #ffffff;
+  box-shadow: 0 4px 15px rgba(124, 77, 255, 0.4);
+}
+
+#age-yes-btn:hover,
+#code-submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(124, 77, 255, 0.5);
+}
+
+#age-no-btn,
+#code-cancel-btn {
+  background: var(--color-surface-2);
+  color: var(--color-text);
+  border: 1.5px solid var(--color-border);
+}
+
+#age-no-btn:hover,
+#code-cancel-btn:hover {
+  background: var(--color-bg);
+}
+
+.code-gate-hint {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin-top: 12px;
+  font-style: italic;
+}
+
+/* ============================================================
+   ACCESS DENIED
+   ============================================================ */
+.access-denied {
+  position: fixed;
+  inset: 0;
+  background: #000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.access-denied__box {
+  text-align: center;
+  padding: 40px 24px;
+}
+
+.access-denied__icon {
+  font-size: 5rem;
+  margin-bottom: 16px;
+}
+
+.access-denied__title {
+  font-family: var(--font-display);
+  font-size: 4rem;
+  color: var(--color-red-sector);
+  margin-bottom: 16px;
+  text-shadow: 0 0 30px rgba(255, 23, 68, 0.5);
+}
+
+.access-denied__text {
+  font-size: var(--text-lg);
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}

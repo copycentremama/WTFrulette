@@ -1,0 +1,181 @@
+/* ============================================================
+   WTF-РУЛЕТКА — LUX Design Tokens (Sprint 12: Red Velvet)
+   ============================================================ */
+
+/* === Дизайн-токены === */
+:root.theme-lux {
+  /* Тёмный красный бархат */
+  --color-bg: #0a0202;
+  --color-surface: #140505;
+  --color-accent: #D4AF37; /* Золото */
+  --color-accent-secondary: #C9A84C;
+  --color-text: #f0f0f0;
+  --color-border: rgba(212, 175, 55, 0.3);
+  
+  --card-white-bg: rgba(255, 255, 255, 0.08); /* Чуть светлее на красном */
+  --card-black-bg: rgba(10, 2, 2, 0.95);
+  --card-red-bg: rgba(139, 0, 0, 0.9);
+  
+  --font-display: 'Playfair Display', serif;
+  --font-body: 'Inter', sans-serif;
+  
+  --radius-lg: 16px; 
+  --radius-full: 9999px;
+  
+  --shadow-gold: 0 0 30px rgba(212, 175, 55, 0.2);
+
+  /* Переопределение переменных для колеса */
+  --color-gold: #D4AF37;
+  --color-gold-light: #E8C96A;
+}
+
+/* Изменения фона для всей темы */
+.theme-lux body {
+  background-color: var(--color-bg);
+  /* Градиент от #2a0808 до #0a0202 с бархатной текстурой */
+  background-image: 
+    repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 4px,
+      rgba(0, 0, 0, 0.2) 4px,
+      rgba(0, 0, 0, 0.2) 5px
+    ),
+    linear-gradient(180deg, #2a0808 0%, #0a0202 100%);
+}
+
+/* === Стили модального окна Age Verification === */
+.theme-lux .age-gate-modal__box {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-accent);
+  box-shadow: var(--shadow-gold);
+}
+
+.theme-lux .age-gate-buttons button {
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
+  background: transparent;
+  transition: all 0.3s ease;
+}
+
+.theme-lux .age-gate-buttons button:hover {
+  background: rgba(212, 175, 55, 0.1);
+}
+
+/* === Стили модального окна Code Input === */
+.theme-lux .code-gate-modal__box {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-accent);
+  box-shadow: var(--shadow-gold);
+}
+
+.theme-lux .code-gate-title {
+  color: var(--color-accent);
+  text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+}
+
+.theme-lux #lux-code-input {
+  border: 1px solid var(--color-accent);
+  background: rgba(0, 0, 0, 0.5);
+  color: var(--color-accent);
+  box-shadow: inset 0 0 10px rgba(212, 175, 55, 0.1);
+}
+
+.theme-lux #code-submit-btn {
+  background: linear-gradient(160deg, #D4AF37, #C9A84C);
+  color: #050505;
+  border: none;
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+  font-weight: bold;
+}
+
+.theme-lux #code-cancel-btn {
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
+  background: transparent;
+}
+
+/* === Карточки заданий (LUX: Тёмный бархат + Золотое тиснение) === */
+.theme-lux .card,
+.theme-lux .card--white, 
+.theme-lux .card--black, 
+.theme-lux .card--red {
+  background: none;
+  background-color: #110000;
+  background-image: 
+    repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.45) 2px,
+      rgba(0, 0, 0, 0.45) 4px
+    ),
+    linear-gradient(135deg, #2a0000 0%, #0a0000 100%);
+  border: 2px solid #D4AF37;
+  box-shadow: 
+    0 10px 30px rgba(0,0,0,0.8),
+    inset 0 0 20px rgba(212, 175, 55, 0.1);
+}
+
+/* Золотое тиснение текста (буквы) */
+.theme-lux .card__title,
+.theme-lux .card__text,
+.theme-lux .card__icon,
+.theme-lux .card__badge,
+.theme-lux .card--white .card__title,
+.theme-lux .card--white .card__text,
+.theme-lux .card--black .card__title,
+.theme-lux .card--black .card__text,
+.theme-lux .card--red .card__title,
+.theme-lux .card--red .card__text {
+  color: #D4AF37 !important;
+  text-shadow: 
+    -1px -1px 0 rgba(255, 255, 255, 0.1),
+    1px 1px 2px rgba(0, 0, 0, 0.9),
+    0px 2px 5px rgba(0, 0, 0, 0.9),
+    0px 0px 8px rgba(212, 175, 55, 0.4) !important;
+}
+
+.theme-lux .card__badge {
+  background: rgba(0, 0, 0, 0.6) !important;
+  border: 1px solid rgba(212, 175, 55, 0.5) !important;
+  box-shadow: inset 0 0 5px rgba(0,0,0,0.9) !important;
+}
+
+.theme-lux .card__text::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 55, 0.3) !important;
+}
+
+/* Золотая кнопка "Принято" */
+.theme-lux .card__btn,
+.theme-lux .card--white .card__btn,
+.theme-lux .card--black .card__btn,
+.theme-lux .card--red .card__btn {
+  background: linear-gradient(160deg, #D4AF37 0%, #997A20 100%) !important;
+  color: #050505 !important;
+  border: 1px solid #FFDF73 !important;
+  box-shadow: 
+    0 5px 15px rgba(0,0,0,0.6),
+    inset 0 2px 5px rgba(255,255,255,0.4) !important;
+  text-shadow: 0 1px 1px rgba(255,255,255,0.3) !important;
+  font-weight: 800 !important;
+}
+
+/* Особая пульсация для красных карточек (Треш) в LUX */
+.theme-lux .card--red {
+  animation: lux-pulse-card 2.5s infinite;
+}
+
+@keyframes lux-pulse-card {
+  0%, 100% { box-shadow: 0 10px 30px rgba(0,0,0,0.8), inset 0 0 20px rgba(212, 175, 55, 0.1); }
+  50% { box-shadow: 0 15px 40px rgba(0,0,0,0.95), inset 0 0 40px rgba(212, 175, 55, 0.3); }
+}
+
+/* === Анимация перехода между темами (Базовая <-> LUX) === */
+body {
+  transition: background-color 0.3s ease, background-image 0.3s ease, color 0.3s ease;
+}
+
+.app, .setup-screen, .modal__inner, .card {
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}

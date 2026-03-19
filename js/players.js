@@ -23,7 +23,7 @@ window.PlayersController = (function () {
   ];
 
   // === Состояние ===
-  let allPlayers       = [];   // [{name, score, roundScore, color, eliminated}]
+  let allPlayers       = [];   // [{name, roundScore, color, eliminated}]
   let activePlayers    = [];   // Только неисключённые
   let currentIndex     = 0;
   let round            = 0;
@@ -45,7 +45,6 @@ window.PlayersController = (function () {
   function init(names) {
     allPlayers = names.map((name, i) => ({
       name:       name.trim() || 'Игрок ' + (i + 1),
-      score:      0,
       roundScore: 0,
       color:      AVATAR_COLORS[i % AVATAR_COLORS.length],
       eliminated: false,
@@ -68,6 +67,7 @@ window.PlayersController = (function () {
   }
 
   function getRound()     { return round; }
+  function getPlayerCount() { return activePlayers.length; }  // Спринт 8: количество игроков
   function getSpinInfo()  { return { current: spinInRound, total: totalSpinsInRound }; }
   function isInTiebreak() { return tiebreakMode; }
   function getActiveCount() { return activePlayers.length; }
@@ -79,7 +79,6 @@ window.PlayersController = (function () {
     const pts    = POINTS[sector] || 0;
     const player = getCurrentPlayer();
     if (player) {
-      player.score      += pts;
       player.roundScore += pts;
     }
     return pts;
@@ -125,9 +124,14 @@ window.PlayersController = (function () {
   // =============================================
   function _endRound() {
     // Собираем результаты раунда
-    const scores = activePlayers.map(p => ({ name: p.name, roundScore: p.roundScore, color: p.color }));
+    // Спринт 9: используем roundScore (очки за раунд), а не score (очки за игру)
+    const scores = activePlayers.map(p => ({
+      name: p.name,
+      roundScore: p.roundScore,
+      color: p.color
+    }));
 
-    // Находим минимальный roundScore
+    // Находим минимальный roundScore (Спринт 9: вылет по наименьшему счёту в раунде)
     const minScore = Math.min(...activePlayers.map(p => p.roundScore));
     const losers   = activePlayers.filter(p => p.roundScore === minScore);
 
@@ -160,7 +164,11 @@ window.PlayersController = (function () {
 
     return {
       type: 'roundEnd',
-      eliminated: { name: eliminated.name, color: eliminated.color, score: eliminated.score },
+      eliminated: {
+        name: eliminated.name,
+        color: eliminated.color,
+        roundScore: eliminated.roundScore  // Спринт 9: очки раунда, не игры
+      },
       scores,
     };
   }
@@ -205,7 +213,11 @@ window.PlayersController = (function () {
 
     return {
       type: 'roundEnd',
-      eliminated: { name: eliminated.name, color: eliminated.color, score: eliminated.score },
+      eliminated: {
+        name: eliminated.name,
+        color: eliminated.color,
+        roundScore: eliminated.roundScore  // Спринт 9: очки раунда
+      },
       scores: activePlayers.map(p => ({ name: p.name, roundScore: p.roundScore, color: p.color })),
     };
   }
@@ -275,8 +287,7 @@ window.PlayersController = (function () {
           <div class="score-row ${isActive ? 'score-row--active' : ''}">
             <span class="score-avatar" style="background:${p.color}">${_initials(p.name)}</span>
             <span class="score-name">${_escape(p.name)}</span>
-            <span class="score-round-pts">${p.roundScore}</span>
-            <span class="score-pts">${p.score} <small>очк.</small></span>
+            <span class="score-round-pts">${p.roundScore} <small>очк.</small></span>
           </div>`;
       }).join('');
     }
@@ -306,6 +317,7 @@ window.PlayersController = (function () {
     getAll,
     bindDOM,
     getRound,
+    getPlayerCount,  // Спринт 8: публичный метод
     getSpinInfo,
     isInTiebreak,
     getActiveCount,

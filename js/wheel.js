@@ -2,9 +2,12 @@
  * КОЛЕСО ТРЕША — wheel.js
  * Canvas-рендер колеса фортуны + логика вращения + определение сектора
  *
+ * Спринт 8: Новая механика (CR-002-002)
+ *
  * Архитектура:
- *   - 20 сегментов: 13 белых + 6 чёрных + 1 красный
- *   - Вероятности: белый 65%, чёрный 30%, красный 5%
+ *   - 10 сегментов: динамическое соотношение белых/чёрных/красных
+ *   - Вероятности меняются каждый раунд
+ *   - К финалу: 0% белых, только чёрные и красные
  *   - Указатель находится сверху → финальный угол читается от -90°
  *   - Событие 'wheelStopped' с { detail: { sector } } после остановки
  */
@@ -13,15 +16,97 @@ window.WheelController = (function () {
   'use strict';
 
   // === Конфигурация секторов (мутабельная — перестраивается каждый раунд) ===
+  // Спринт 8: 10 секторов вместо 20
   let SEGMENTS = [
-    'white', 'black', 'white', 'white', 'white',
-    'black', 'white', 'white', 'white', 'black',
-    'white', 'red',  'white', 'black', 'white',
-    'white', 'black', 'white', 'black', 'white',
+    'white', 'white', 'black', 'white', 'black',
+    'white', 'red', 'white', 'black', 'white',
   ];
 
   let TOTAL = SEGMENTS.length;
   let ARC   = (2 * Math.PI) / TOTAL;
+
+  // ╔══════════════════════════════════════════╗
+  // ║  Спринт 8: ДИНАМИЧЕСКИЕ ВЕРОЯТНОСТИ      ║
+  // ╚══════════════════════════════════════════╝
+
+  // Прогрессия вероятностей по раундам (для 10 секторов)
+  // Раунд 1: 6W / 3B / 1R (60% / 30% / 10%)
+  // Раунд 2: 5W / 4B / 1R (50% / 40% / 10%)
+  // Раунд 3: 4W / 4B / 2R (40% / 40% / 20%)
+  // Раунд 4: 3W / 5B / 2R (30% / 50% / 20%)
+  // Раунд 5: 2W / 5B / 3R (20% / 50% / 30%)
+  // Финал:  0W / 6B / 4R (0% / 60% / 40%)
+  const ROUND_PROGRESSION = [
+    { w: 6, b: 3, r: 1 }, // Раунд 1
+    { w: 5, b: 4, r: 1 }, // Раунд 2
+    { w: 4, b: 4, r: 2 }, // Раунд 3
+    { w: 3, b: 5, r: 2 }, // Раунд 4
+    { w: 2, b: 5, r: 3 }, // Раунд 5
+    { w: 0, b: 6, r: 4 }, // Финал (максимум)
+  ];
+
+  /**
+   * Расчёт секторов для текущего раунда
+   * @param {number} roundNum - номер раунда (1-based)
+   * @param {number} playerCount - количество игроков (2-8)
+   * @returns {object} { whiteCount, blackCount, redCount }
+   */
+  function getSectorsForRound(roundNum, playerCount) {
+    // Выбор прогрессии в зависимости от раунда
+    const index = Math.min(roundNum - 1, ROUND_PROGRESSION.length - 1);
+    const baseProbs = ROUND_PROGRESSION[index];
+
+    // Адаптация от числа игроков:
+    // 2 игрока: прогрессия быстрее (x1.3)
+    // 3-4 игрока: стандарт (x1.0)
+    // 5-8 игроков: прогрессия медленнее (x0.8)
+    let multiplier = 1.0;
+    if (playerCount === 2) {
+      multiplier = 1.3;
+    } else if (playerCount >= 5) {
+      multiplier = 0.8;
+    }
+
+    // Корректировка с округлением
+    let whiteCount = Math.round(baseProbs.w / multiplier);
+    let blackCount = Math.round(baseProbs.b * multiplier);
+    let redCount = Math.round(baseProbs.r * multiplier);
+
+    // Гарантируем сумму = 10
+    const total = whiteCount + blackCount + redCount;
+    if (total !== 10) {
+      const diff = 10 - total;
+      // Добавляем/вычитаем из наибольшей категории
+      if (diff > 0) {
+        if (blackCount >= whiteCount && blackCount >= redCount) {
+          blackCount += diff;
+        } else if (whiteCount >= blackCount && whiteCount >= redCount) {
+          whiteCount += diff;
+        } else {
+          redCount += diff;
+        }
+      } else {
+        if (whiteCount >= blackCount && whiteCount >= redCount) {
+          whiteCount += diff; // diff отрицательный
+        } else if (blackCount >= whiteCount && blackCount >= redCount) {
+          blackCount += diff;
+        } else {
+          redCount += diff;
+        }
+      }
+    }
+
+    // Финал: гарантированно 0 белых
+    if (roundNum >= ROUND_PROGRESSION.length) {
+      whiteCount = 0;
+      // Перераспределяем белые между чёрными и красными
+      const extra = blackCount + redCount;
+      blackCount = Math.round(extra * 0.6); // 60% чёрных
+      redCount = extra - blackCount;        // 40% красных
+    }
+
+    return { whiteCount, blackCount, redCount };
+  }
 
   // Перестройка секторов по заданным количествам.
   // Гарантирует: max 2 одинаковых сектора подряд (включая wrap по кольцу).
@@ -441,6 +526,7 @@ window.WheelController = (function () {
     init,
     spin,
     rebuildSegments,
+    getSectorsForRound,  // Спринт 8: публичный метод для расчёта вероятностей
     getAngleDeg: () => ((currentAngle * 180 / Math.PI) % 360).toFixed(1),
     currentSector: detectSector,
   };

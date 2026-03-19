@@ -162,17 +162,19 @@ window.ModalController = (function () {
     const sector = currentSector;
     hide();
 
-    // Показываем penalty-popup с небольшой задержкой
+    // ✅ BUG-008 FIX: СРАЗУ отправляем событие — разблокировка произойдёт мгновенно
+    document.dispatchEvent(new CustomEvent('taskRefused', {
+      bubbles: true,
+      detail: { sector },
+    }));
+
+    // Penalty-modal показываем с небольшой задержкой (для визуального эффекта)
     setTimeout(() => {
       if (penaltyModal) {
         penaltyModal.hidden = false;
         penaltyOkBtn?.focus();
       }
-      document.dispatchEvent(new CustomEvent('taskRefused', {
-        bubbles: true,
-        detail: { sector },
-      }));
-    }, 260);
+    }, 100);  // Уменьшено с 260ms до 100ms
   });
 
   // === Закрытие penalty-popup ===

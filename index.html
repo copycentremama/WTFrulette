@@ -5,7 +5,26 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="theme-color" content="#13141A" />
-  <title>WTF-Рулетка: Прощай репутация</title>
+
+  <!-- SEO Meta Tags (SEO Specialist CR-003) -->
+  <title>WTF-Рулетка 🎲🔥🔐 Частная коллекция 21+</title>
+  <meta name="description" content="200+ безумных заданий для вечеринок. Крути колесо, выполняй задания, теряй репутацию! Эксклюзивная версия 21+ (private luxury edition).">
+  <meta name="keywords" content="игра для вечеринок, колесо фортуны, 18+, задания для вечеринок, WTF рулетка, игры для компаний, 21+, private, luxury">
+  <meta name="robots" content="index, follow">
+  <meta name="author" content="DreamTeam">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="WTF-Рулетка 🎲🔥🔐 Частная коллекция">
+  <meta property="og:description" content="200+ заданий. 3 уровня треша. Эксклюзивная версия 21+">
+  <meta property="og:image" content="https://yourdomain.com/og-share.jpg">
+  <meta property="og:url" content="https://yourdomain.com/">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="WTF-Рулетка 🎲🔥🔐 Частная коллекция">
+  <meta name="twitter:description" content="200+ безумных заданий. Крути и теряй репутацию! Эксклюзивная версия 21+">
+  <meta name="twitter:image" content="https://yourdomain.com/twitter-share.jpg">
 
   <!-- Google Fonts: Bebas Neue (заголовки) + Outfit + Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -19,17 +38,16 @@
 
   <!-- Дизайн-токены -->
   <link rel="stylesheet" href="design/tokens.css" />
+  <link rel="stylesheet" href="design/tokens-lux.css" />
   <!-- Основные стили -->
   <link rel="stylesheet" href="css/style.css" />
 </head>
 
 <body>
 
-  <!-- Глобальные контроллеры -->
+  <!-- Кнопка правил (единственный контроллер) -->
   <div class="top-controls">
-    <button id="rules-btn" class="control-btn rules-icon-btn" type="button" aria-label="Правила">📜</button>
-    <button id="theme-btn" class="control-btn" type="button" aria-label="Смена темы">🌓</button>
-    <button id="mute-btn" class="control-btn" type="button" aria-label="Звук">🔊</button>
+    <button id="rules-btn" class="control-btn rules-icon-btn" type="button" aria-label="Правила">❓</button>
   </div>
 
   <!-- ╔══════════════════════════════════════════╗
@@ -69,17 +87,21 @@
         <p class="level-title">Уровень игры:</p>
         <label class="level-label">
           <input type="radio" name="game-level" value="normal" class="level-radio" checked>
-          <span class="level-text">Репутация под угрозой (Базовый)</span>
+          <span class="level-text">🎲 Репутация под угрозой (Базовый)</span>
         </label>
         <label class="level-label">
           <input type="radio" name="game-level" value="18plus" class="level-radio">
-          <span class="level-text">Прощай репутация (18+)</span>
+          <span class="level-text">🔥 Прощай репутация (18+)</span>
+        </label>
+        <label class="level-label">
+          <input type="radio" name="game-level" value="21plus" class="level-radio">
+          <span class="level-text">🔐 Частная коллекция (21+)</span>
         </label>
       </div>
 
       <!-- Кнопка правил (на видном месте) -->
       <button id="rules-btn-setup" class="setup-rules-btn" type="button">
-        📜 Правила игры
+        ❓ Правила игры
       </button>
 
       <!-- Кнопка старта -->
@@ -255,7 +277,7 @@
   <div id="rules-modal" class="rules-modal" role="dialog" aria-modal="true" hidden>
     <div class="rules-modal__box">
       <div class="rules-header">
-        <div class="rules-logo">📜</div>
+        <div class="rules-logo">❓</div>
         <div class="rules-header-text">
           <h3>ПРАВИЛА ИГРЫ</h3>
           <p>Manual & Versions</p>
@@ -266,10 +288,22 @@
         <section class="rules-section">
           <h4><span class="dot"></span> ОСНОВЫ</h4>
           <ul class="rules-list">
-            <li class="rules-item">Каждый игрок делает <b>3 хода</b> за раунд.</li>
-            <li class="rules-item"><b>Белый</b> — 25 очков, <b>Черный</b> — 50, <b>Красный</b> — 100.</li>
+            <li class="rules-item">Игроков: <b>2–8</b>. Каждый делает <b>3 хода</b> за раунд.</li>
+            <li class="rules-item"><b>Белый</b> — 25 очков, <b>Чёрный</b> — 50, <b>Красный</b> — 100.</li>
+            <li class="rules-item">Очки <b>сбрасываются</b> после каждого раунда.</li>
             <li class="rules-item">При отказе наказание придумывают <b>другие игроки</b>.</li>
-            <li class="rules-item">В конце раунда игрок с худшим счетом <b>вылетает</b>.</li>
+            <li class="rules-item">В конце раунда игрок с <b>наименьшим счётом</b> вылетает.</li>
+            <li class="rules-item">При ничьей — <b>тайбрейк</b>: задание на вылет.</li>
+          </ul>
+        </section>
+
+        <section class="rules-section">
+          <h4><span class="dot"></span> КОЛЕСО</h4>
+          <ul class="rules-list">
+            <li class="rules-item"><b>10 секторов:</b> Белый / Чёрный / Красный.</li>
+            <li class="rules-item">Вероятности <b>растут</b> каждый раунд: больше чёрных и красных.</li>
+            <li class="rules-item">В последнем раунде — <b>только Чёрные и Красные</b> (0% белых).</li>
+            <li class="rules-item">Адаптация: меньше игроков — выше шанс красных.</li>
           </ul>
         </section>
 
@@ -277,14 +311,28 @@
           <h4><span class="dot"></span> ВЕРСИИ ИГРЫ</h4>
           <div class="rules-comparison">
             <div class="ver-card">
-              <span class="ver-name">БАЗОВАЯ</span>
-              <span class="ver-desc">Легкий флирт, дискомфорт и веселье.</span>
+              <span class="ver-name">🎲 БАЗОВАЯ</span>
+              <span class="ver-desc">Лёгкий флирт, весёлый дискомфорт, безумные шутки. 18+</span>
             </div>
             <div class="ver-card pro">
-              <span class="ver-name">18+ ТРЕШ</span>
-              <span class="ver-desc">Максимальный риск и безумные задания.</span>
+              <span class="ver-name">🔥 18+ ТРЕШ</span>
+              <span class="ver-desc">Максимальный риск, стыдные задания, потеря репутации.</span>
+            </div>
+            <div class="ver-card lux">
+              <span class="ver-name">🔐 ЧАСТНАЯ КОЛЛЕКЦИЯ</span>
+              <span class="ver-desc">Только по коду. 21+. Самые откровенные и смелые задания.</span>
             </div>
           </div>
+        </section>
+
+        <section class="rules-section">
+          <h4><span class="dot"></span> ДОСТУП 21+</h4>
+          <ul class="rules-list">
+            <li class="rules-item">Требуется <b>подтверждение возраста</b> (21+).</li>
+            <li class="rules-item">LUX-версия доступна <b>только по коду</b>.</li>
+            <li class="rules-item">Код выдаётся лично <b>организатором вечеринки</b>.</li>
+            <li class="rules-item">Подтверждение сохраняется — <b>не нужно вводить каждый раз</b>.</li>
+          </ul>
         </section>
       </div>
 
@@ -294,13 +342,66 @@
     </div>
   </div>
 
+  <!-- ╔══════════════════════════════════════════╗
+       ║  AGE VERIFICATION (21+)                  ║
+       ╚══════════════════════════════════════════╝ -->
+  <div id="age-gate-modal" class="age-gate-modal" role="alertdialog" aria-modal="true" hidden>
+    <div class="age-gate-modal__box">
+      <div class="age-gate-icon">🔞</div>
+      <h3 class="age-gate-title">ПРОВЕРКА ВОЗРАСТА</h3>
+      <p class="age-gate-text">Эта версия игры доступна только для игроков старше 21 года.</p>
+      <p class="age-gate-subtext">Вам уже есть 21 год?</p>
+      <div class="age-gate-buttons">
+        <button id="age-no-btn" type="button">Нет, мне нет 21</button>
+        <button id="age-yes-btn" type="button">Да, мне есть 21</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ╔══════════════════════════════════════════╗
+       ║  CODE GATE (LUX ACCESS)                  ║
+       ╚══════════════════════════════════════════╝ -->
+  <div id="code-gate-modal" class="code-gate-modal" role="alertdialog" aria-modal="true" hidden>
+    <div class="code-gate-modal__box">
+      <div class="code-gate-icon">🔐</div>
+      <h3 class="code-gate-title">WTF: ЧАСТНАЯ КОЛЛЕКЦИЯ</h3>
+      <p class="code-gate-text">Введите код для доступа к LUX-версии</p>
+      <input
+        type="text"
+        id="lux-code-input"
+        maxlength="8"
+        placeholder="●●●●●●●●"
+        autocomplete="off"
+        aria-label="Код доступа"
+      >
+      <p id="code-error" class="code-error" hidden>Неверный код. Обратитесь к организатору игры.</p>
+      <div class="code-gate-buttons">
+        <button id="code-cancel-btn" type="button">Отмена</button>
+        <button id="code-submit-btn" type="button">ВОЙТИ</button>
+      </div>
+      <p class="code-gate-hint">Код выдаётся лично организатором игры</p>
+    </div>
+  </div>
+
+  <!-- ╔══════════════════════════════════════════╗
+       ║  ACCESS DENIED                           ║
+       ╚══════════════════════════════════════════╝ -->
+  <div id="access-denied" class="access-denied" hidden>
+    <div class="access-denied__box">
+      <div class="access-denied__icon">🔞</div>
+      <h1 class="access-denied__title">18+</h1>
+      <p class="access-denied__text">Доступ запрещён.<br>Игра доступна только для лиц старше 21 года.</p>
+    </div>
+  </div>
+
   <!-- Скрипты (порядок важен!) -->
-  <script src="js/audio.js"></script>
+  <!-- audio.js удалён — CR-002: звуки отключены -->
   <script src="js/wheel.js"></script>
   <script src="js/modal.js"></script>
   <script src="js/players.js"></script>
   <script src="data/tasks.js"></script>
   <script src="data/tasks_18plus.js"></script>
+  <script src="data/tasks_21plus.js"></script>
   <script src="js/app.js"></script>
 
 </body>
